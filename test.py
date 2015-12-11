@@ -27,8 +27,8 @@ class TestDockerCaching(unittest.TestCase):
         key = 'docker-context-build'
         print key.replace("-", " ")
         with open("context.tar") as f:
-            subprocess.check_output(["docker", "build", "-t", "docker_build", "-"], stdin=f)
-        self.branched_history[key] = subprocess.check_output(["docker", "history", "-q", "docker_build"]).splitlines()
+            subprocess.check_output(["docker", "build", "-t", "docker_context_build", "-"], stdin=f)
+        self.branched_history[key] = subprocess.check_output(["docker", "history", "-q", "docker_context_build"]).splitlines()
         self.branched_history[key].reverse()
 
     def _test_compose_build(self):

@@ -4,17 +4,24 @@ import subprocess
 from subprocess import CalledProcessError
 
 
+IMAGE_TAGS = [
+    "docker_build",
+    "docker_context_build",
+    "caching_simple",
+    "docker_py_build",
+    "docker_py_context_build",
+]
+
 class TestDockerCaching(unittest.TestCase):
     branched_history = dict()
 
     @classmethod
     def setUpClass(cls):
-        try:
-            subprocess.check_output(["docker", "rmi", "-f", "docker_build"])
-            subprocess.check_output(["docker", "rmi", "-f", "caching_simple"])
-            subprocess.check_output(["docker", "rmi", "-f", "docker_py_build"])
-        except CalledProcessError as e:
-            pass
+        for image_tag in IMAGE_TAGS:
+            try:
+                subprocess.check_output(["docker", "rmi", "-f", image_tag])
+            except CalledProcessError as e:
+                pass
 
     def _test_build(self):
         key = 'docker-build'
@@ -62,10 +69,10 @@ class TestDockerCaching(unittest.TestCase):
         self.branched_history[key].reverse()
 
     def test_compare_cache(self):
-        self._test_py_context_build()
         self._test_build()
         self._test_context_build()
         self._test_py_build()
+        self._test_py_context_build()
         self._test_compose_build()
         self.assertTrue(self.branched_history)
         max_key_length = max(map(lambda x: len(x), self.branched_history.keys()))
